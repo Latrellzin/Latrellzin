@@ -1,0 +1,27 @@
+import pandas as pd
+
+contatos_df = pd.read_excel("Enviar.xlsx")
+display(contatos_df)
+
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+import time
+import urllib
+
+navegador = webdriver.Chrome()
+navegador.get("https://web.whatsapp.com/")
+
+while len(navegador.find_elements(By.ID, "side")) < 1:
+    time.sleep(1)
+#já estamos com login feito no whatsapp web
+for i, mensagem in enumerate(contatos_df['Mensagem']):
+    pessoa = contatos_df.loc[i, "Pessoa"]
+    numero = contatos_df.loc[i, "Número"]
+    texto = urllib.parse.quote(f"Boa Tarde!\n \n {pessoa}!\n \n {mensagem}")
+    link = f"https://web.whatsapp.com/send?phone={numero}&text={texto}"
+    navegador.get(link)
+    while len(navegador.find_elements(By.ID, "side")) < 1:
+        time.sleep(6)   
+    navegador.find_element(By.XPATH,"//span[@data-icon='send']").click()
+    time.sleep(10) 
+    
